@@ -1,0 +1,48 @@
+workflows:
+  bangla-genius-10:
+    name: Bangla Genius 10 Android Build
+
+    max_build_duration: 120
+
+    environment:
+      java: 17
+
+    cache:
+      cache_paths:
+        - ~/.gradle/caches
+        - ~/.gradle/wrapper
+
+    scripts:
+      - name: Check Project
+        script: |
+          pwd
+          ls -la
+
+      - name: Configure Android SDK
+        script: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+
+      - name: Check Gradle Wrapper
+        script: |
+          if [ ! -f "./gradlew" ]; then
+            echo "ERROR: gradlew is missing from project root."
+            echo "Please add the Gradle Wrapper before building."
+            exit 1
+          fi
+
+      - name: Make Gradle Executable
+        script: |
+          chmod +x ./gradlew
+
+      - name: Clean Project
+        script: |
+          ./gradlew clean
+
+      - name: Build Debug APK
+        script: |
+          ./gradlew assembleDebug --stacktrace
+
+    artifacts:
+      - app/build/outputs/**/*.apk
+      - "**/build/outputs/**/*.apk"
+      - "**/build/reports/**/*"
